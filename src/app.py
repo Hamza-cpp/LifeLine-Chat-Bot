@@ -15,19 +15,36 @@
 import os
 from dotenv import load_dotenv
 from twilio.rest import Client
+from groq import Groq
 
 load_dotenv()
 
 # Your Account SID and Auth Token from console.twilio.com
-account_sid = os.environ["TWILIO_ACCOUNT_SID"]
-auth_token = os.environ["TWILIO_AUTH_TOKEN"]
+twilio_account_sid = os.environ["TWILIO_ACCOUNT_SID"]
+twilio_auth_token = os.environ["TWILIO_AUTH_TOKEN"]
 
-client = Client(account_sid, auth_token)
+# your Groq Api key from console.groq.com
+groq_api_key = os.environ["GROQ_API_KEY"]
 
-message = client.messages.create(
-    to="whatsapp:+212620661864",
-    from_="whatsapp:+14155238886",
-    body="Hello frhhhhhhhhhhhhhhhhhhhhhhom Python!",
+# twilio_client = Client(twilio_account_sid, twilio_auth_token)
+# message = twilio_client.messages.create(
+#     to="whatsapp:+212620661864",
+#     from_="whatsapp:+14155238886",
+#     body="Hello frhhhhhhhhhhhhhhhhhhhhhhom Python!",
+# )
+
+# print(message.sid)
+
+
+groq_client = Groq(api_key=groq_api_key)
+chat_completion = groq_client.chat.completions.create(
+    messages=[
+        {
+            "role": "user",
+            "content": "Explain the importance of fast language models",
+        }
+    ],
+    model="llama3-8b-8192",
 )
 
-print(message.sid)
+print(chat_completion.choices[0].message.content)
