@@ -13,11 +13,13 @@
 # limitations under the License.
 
 import os
-from dotenv import load_dotenv
-from twilio.rest import Client
 from groq import Groq
+from dotenv import load_dotenv
+from flask import Flask, request
+from twilio.twiml.messaging_response import MessagingResponse
 
 load_dotenv()
+app = Flask(__name__)
 
 # Your Account SID and Auth Token from console.twilio.com
 twilio_account_sid = os.environ["TWILIO_ACCOUNT_SID"]
@@ -37,14 +39,47 @@ groq_api_key = os.environ["GROQ_API_KEY"]
 
 
 groq_client = Groq(api_key=groq_api_key)
-chat_completion = groq_client.chat.completions.create(
-    messages=[
-        {
-            "role": "user",
-            "content": "Explain the importance of fast language models",
-        }
-    ],
-    model="llama3-8b-8192",
-)
 
-print(chat_completion.choices[0].message.content)
+
+def generate_answer(question):
+    chat_completion = groq_client.chat.completions.create(
+        messages=[
+            {
+                "role": "user",
+                "content": question,
+            }
+        ],
+        model="llama3-8b-8192",
+    )
+
+    answer = chat_completion.choices[0].message.content
+    return answer
+
+
+@app.route("/")
+def hello_world():
+    
+    return "✨ Hello, everyone the Life line Chat Bot is here ✨"
+
+
+# Define a route to handle incoming requests
+@app.route("/whatsapp", methods=["POST"])
+def whatsapp():
+    incoming_msg = request.values.get("Body", "").lower()
+    print("WhatsApp Message: ", incoming_msg)
+
+    # Generate the answer
+    answer = generate_answer(incoming_msg)
+    print("BOT Answer: ", answer)
+
+    # Create a Twilio response
+    resp = MessagingResponse()
+    msg = resp.message()
+    msg.body(answer)
+
+    return str(resp)
+
+
+# Run the Flask app
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", debug=False, port=5000)
