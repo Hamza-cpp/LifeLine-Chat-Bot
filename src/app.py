@@ -13,7 +13,6 @@
 # limitations under the License.
 
 import os
-from groq import Groq
 from dotenv import load_dotenv
 from flask import Flask, request
 from twilio.twiml.messaging_response import MessagingResponse
@@ -24,36 +23,20 @@ app = Flask(__name__)
 # Your Account SID and Auth Token from console.twilio.com
 twilio_account_sid = os.environ["TWILIO_ACCOUNT_SID"]
 twilio_auth_token = os.environ["TWILIO_AUTH_TOKEN"]
+ 
+# def generate_answer(question):
+#     chat_completion = groq_client.chat.completions.create(
+#         messages=[
+#             {
+#                 "role": "user",
+#                 "content": question,
+#             }
+#         ],
+#         model="llama3-8b-8192",
+#     )
 
-# your Groq Api key from console.groq.com
-groq_api_key = os.environ["GROQ_API_KEY"]
-
-# twilio_client = Client(twilio_account_sid, twilio_auth_token)
-# message = twilio_client.messages.create(
-#     to="whatsapp:+212620661864",
-#     from_="whatsapp:+14155238886",
-#     body="Hello frhhhhhhhhhhhhhhhhhhhhhhom Python!",
-# )
-
-# print(message.sid)
-
-
-groq_client = Groq(api_key=groq_api_key)
-
-
-def generate_answer(question):
-    chat_completion = groq_client.chat.completions.create(
-        messages=[
-            {
-                "role": "user",
-                "content": question,
-            }
-        ],
-        model="llama3-8b-8192",
-    )
-
-    answer = chat_completion.choices[0].message.content
-    return answer
+#     answer = chat_completion.choices[0].message.content
+#     return answer
 
 
 @app.route("/")
